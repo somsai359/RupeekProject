@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create Event</title>
+   
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+            margin-top: 20px;
+            background-image: url('background.jpg');
+            background-size: cover;
+            background-position: top;
+
+            overflow: hidden;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        .container {
+            position: relative;
+            max-width: 400px;
+            margin: 100px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(2px);
+            background-color: rgba(255, 255, 255, 0.8);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        input[type="text"] {
+            width: 95%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #F9F5F6;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #2573c7;
+        }
+        #back-to-sign {
+            margin-top: 10px;
+            text-decoration: none;
+            color: #007bff;
+            transition: color 0.3s ease;
+        }
+
+        #back-to-sign:hover {
+            color: #2573c7;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Create Event</h1>
+        <form id="createEventForm">
+            <label for="eventName">Event Name:</label>
+            <input type="text" id="eventName" required>
+            <br>
+            <label for="city">City:</label>
+            <input type="text" id="city" required>
+            <br>
+            <label for="interest">Interest:</label>
+            <input type="text" id="interest" required>
+            <br>
+            <label for="date">Date(DD-MM-YYYY):</label>
+            <input type="text" id="date" required>
+            <br>
+            <button type="button" onclick="createEventf()">Create Event</button>
+        </form>
+        <button id = "back-tosign" onclick="goToUserDetailsPage()">Back to User Details</button>
+    </div>
+
+    <script>
+        function goToUserDetailsPage() {
+          
+            const urlParams = new URLSearchParams(window.location.search);
+            const userId = urlParams.get('userid');
+            window.location.href = `details.html?userid=${userId}`;
+        }
+        function createEventf() {
+            const eventName = document.getElementById('eventName').value;
+            const city = document.getElementById('city').value;
+            const interestInput = document.getElementById('interest').value; // Get the value of the interest input
+            const interests = interestInput.split(',').map(interest => interest.trim()); 
+            const date = document.getElementById('date').value;
+
+            const event = {
+                eventName: eventName,
+                city: city,
+                interest: interests,
+                date: date
+            };
+
+            
+            fetch('http://localhost:9092/add/event', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(event)
+            })
+            .then(response => {
+                
+                console.log(response);
+                return response.json();
+            })
+            .then(data => {
+                alert('Event created successfully!');
+                const urlParams = new URLSearchParams(window.location.search);
+                const userId = urlParams.get('userid');
+                window.location.href = `details.html?userid=${userId}`;
+            })
+            .catch(error => {
+                console.error('Error occurred:', error);
+                alert('An error occurred while creating the event. Please try again later.');
+            });
+        }
+    </script>
+</body>
+</html>

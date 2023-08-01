@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>User Details</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-image: url('background.jpg');
+            background-size: cover;
+            background-position: cover;
+            overflow: auto;
+
+            font-family: Arial, sans-serif;
+    
+        }
+
+        .container {
+            position: relative;
+            max-width: 400px;
+            margin: 100px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(2px);
+            background-color: rgba(255, 255, 255, 0.8);
+            overflow-y: auto;
+        }
+        .side-panel {
+    /* Your existing styles for the side-panel */
+    float: right;
+    max-width: 300px;
+    margin-top: 100px;
+    margin-right: 20px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(2px);
+    background-color: rgba(255, 255, 255, 0.8);
+    height: 300px;
+    overflow-y: auto;
+}
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        input[type="email"],
+        input[type="password"] {
+            width: 95%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #F9F5F6;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        ul li {
+            margin-bottom: 5px;
+        }
+
+        .back-to-signup {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .back-to-signup a {
+            text-decoration: none;
+            color: #007bff;
+            transition: color 0.3s ease;
+        }
+        
+
+        .back-to-signup a:hover {
+            color: #2573c7;
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+
+        .action-buttons button {
+            padding: 10px 20px;
+            background-color: #527294;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .action-buttons button:hover {
+            background-color: #2573c7;
+        }
+
+
+
+
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #2573c7;
+        }
+    </style>
+</head>
+<body>
+    <div class="action-buttons">
+        <button onclick="goToEventPage()">Local Event</button>
+        <button onclick="goToEventEventPage()">EventBrite Page</button>
+        <button onclick="goToCreateEventPage()">Create Event</button>
+    </div>
+
+    <div class="side-panel">
+        <h2>All Local Interests</h2>
+        <ul id="allInterests"></ul>
+    </div>
+
+    
+    
+    <div class="container">
+        <h1>User Details</h1>
+        <div>
+            <p><strong>First Name:</strong> <span id="firstName"></span></p>
+            <p><strong>Last Name:</strong> <span id="lastName"></span></p>
+            <p><strong>Email:</strong> <span id="email"></span></p>
+            <p><strong>Interests:</strong></p>
+            <ul id="interests"></ul>
+            <p><strong>Registered Events:</strong></p>
+            <ul id="regEvents"></ul>
+
+            
+
+        </div>
+
+        <button onclick="addInterest()">Add Interest</button>
+        <p><a href="index.html">Back to Sign In</a></p>
+        <!-- <button onclick="goToEventPage()">Go to Local Event Page</button>  New button to go to the event page -->
+        <!-- <button onclick="goToEventEventPage()">Go to EventBrite Page</button> 
+        <button onclick="goToCreateEventPage()">Create Event</button>  -->
+    </div>
+    
+
+    <script>
+        function displayInterest(){
+            // Display all interests on the side panel
+            const allInterestsList = document.getElementById('allInterests');
+                allInterestsList.innerHTML = '';
+                interests.forEach(interest => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = interest.interestName;
+                    allInterestsList.appendChild(listItem);
+                });
+        }
+        function displayUserDetails(user) {
+            document.getElementById('firstName').textContent = user.firstName;
+            document.getElementById('lastName').textContent = user.lastName;
+            document.getElementById('email').textContent = user.email;
+
+            const interestsList = document.getElementById('interests');
+            interestsList.innerHTML = ''; 
+            user.interest.forEach(interest => {
+                const listItem = document.createElement('li');
+                listItem.textContent = interest;
+                interestsList.appendChild(listItem);
+            });
+
+            const eventList = document.getElementById('regEvents');
+            eventList.innerHTML = '';
+
+            if (user.regEvents) {
+                user.regEvents.forEach(regEvent => {
+                const listItem = document.createElement('li');
+                listItem.textContent = regEvent;
+                eventList.appendChild(listItem);
+            });
+            } else {
+                const noEventMessage = document.createElement('li');
+                noEventMessage.textContent = 'No registered events';
+                eventList.appendChild(noEventMessage);
+        }
+
+            // user.regEvents.forEach(regEvents => {
+            //     const listItem1 = document.createElement('li');
+            //     listItem1.textContent = regEvents;
+            //     eventList.appendChild(listItem1);
+            // });
+        }
+
+        // Update the addInterest() function to display interests on the side panel
+function addInterest() {
+    const newInterest = prompt('Enter the New Interest:');
+    if (newInterest) {
+        // Fetch the list of interests from the server
+        fetch('http://localhost:9092/interests')
+            .then(response => response.json())
+            .then(interests => {
+                // Check if the newInterest is present in the interests array
+                if (interests.includes(newInterest)) {
+                    // The interest exists, proceed with adding it for the user
+                    fetch(`http://localhost:9092/add/interest/${userId}/${encodeURIComponent(newInterest)}`, {
+                        method: 'PUT',
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            // Fetch and display the updated user details
+                            fetch(`http://localhost:9092/user/${userId}`)
+                                .then(response => response.json())
+                                .then(data => {
+                                    displayUserDetails(data);
+                                })
+                                .catch(error => {
+                                    console.error('Error occurred:', error);
+                                    alert('An error occurred while fetching user details. Please try again later.');
+                                });
+                        } else {
+                            alert('Failed to add interest. Please try again.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error occurred:', error);
+                        alert('An error occurred while adding interest. Please try again later.');
+                    });
+                } else {
+                    // The interest does not exist in the server's list
+                    alert('The entered interest does not exist in the server\'s list of interests. Please enter a valid interest.');
+                }
+                
+                
+            })
+            .catch(error => {
+                console.error('Error occurred:', error);
+                alert('An error occurred while fetching the list of interests. Please try again later.');
+            });
+    }
+}
+
+
+//         function addInterest() {
+//     const newInterest = prompt('Enter the New interest:');
+//     if (newInterest) {
+//         // Fetch the list of interests from the server
+//         fetch('http://localhost:9092/interests')
+//             .then(response => response.json())
+//             .then(interests => {
+//                 // Check if the newInterest is present in the interests array
+//                 if (interests.includes(newInterest)) {
+//                     // The interest exists, proceed with adding it for the user
+//                     fetch(`http://localhost:9092/add/interest/${userId}/${encodeURIComponent(newInterest)}`, {
+//                         method: 'PUT',
+//                     })
+//                     .then(response => {
+//                         if (response.ok) {
+//                             // Fetch and display the updated user details
+//                             fetch(`http://localhost:9092/user/${userId}`)
+//                                 .then(response => response.json())
+//                                 .then(data => {
+//                                     displayUserDetails(data);
+//                                 })
+//                                 .catch(error => {
+//                                     console.error('Error occurred:', error);
+//                                     alert('An error occurred while fetching user details. Please try again later.');
+//                                 });
+//                         } else {
+//                             alert('Failed to add interest. Please try again.');
+//                         }
+//                     })
+//                     .catch(error => {
+//                         console.error('Error occurred:', error);
+//                         alert('An error occurred while adding interest. Please try again later.');
+//                     });
+//                 } else {
+//                     // The interest does not exist in the server's list
+//                     alert('The entered interest does not exist in the server\'s list of interests. Please enter a valid interest.');
+//                 }
+//             })
+//             .catch(error => {
+//                 console.error('Error occurred:', error);
+//                 alert('An error occurred while fetching the list of interests. Please try again later.');
+//             });
+//     }
+// }
+
+
+        // function addInterest() {
+        //     const newInterest = prompt('Enter the new interest:');
+        //     if (newInterest) {
+                
+        //         fetch(`http://localhost:9092/add/interest/${userId}/${encodeURIComponent(newInterest)}`, {
+        //             method: 'PUT',
+        //         })
+        //         .then(response => {
+        //             if (response.ok) {
+                        
+        //                 fetch(`http://localhost:9092/user/${userId}`)
+        //                     .then(response => response.json())
+        //                     .then(data => {
+        //                         displayUserDetails(data);
+        //                     })
+        //                     .catch(error => {
+        //                         console.error('Error occurred:', error);
+        //                         alert('An error occurred while fetching user details. Please try again later.');
+        //                     });
+        //             } else {
+        //                 alert('Failed to add interest. Please try again.');
+        //             }
+        //         })
+        //         .catch(error => {
+        //             console.error('Error occurred:', error);
+        //             alert('An error occurred while adding interest. Please try again later.');
+        //         });
+        //     }
+        // }
+
+        function goToEventPage() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const userId = urlParams.get('userid');
+            window.location.href = `LocalEvent.html?userid=${userId}`;
+        }
+
+        function goToCreateEventPage() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const userId = urlParams.get('userid');
+            window.location.href = `createEvent.html?userid=${userId}`;
+        }
+
+        function goToEventEventPage() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const userId = urlParams.get('userid');
+            window.location.href = `eventBrite.html?userid=${userId}`;
+        }
+
+       
+        const urlParams = new URLSearchParams(window.location.search);
+        const userId = urlParams.get('userid');
+
+        
+        fetch(`http://localhost:9092/user/${userId}`)
+            .then(response => response.json())
+            .then(data => {
+                displayUserDetails(data);
+            })
+            .catch(error => {
+                console.error('Error occurred:', error);
+                alert('An error occurred while fetching user details. Please try again later.');
+            });
+
+            fetch(`http://localhost:9092/interests`)
+            .then(response => response.json())
+            .then(data => {
+                displayInterest(data);
+            })
+            .catch(error => {
+                console.error('Error occurred:', error);
+                alert('An error occurred while fetching interest details. Please try again later.');
+            });
+            
+    </script>
+</body>
+</html>

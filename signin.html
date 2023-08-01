@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Events-Sign In</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-image: url('background.jpg');
+            background-size: cover;
+            background-position: top;
+
+            overflow: hidden;
+        }
+
+        .container {
+            position: relative;
+            max-width: 400px;
+            margin: 100px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(2px);
+            background-color: rgba(255, 255, 255, 0.8);
+        }
+        .back-to-signup {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .back-to-signup a {
+            text-decoration: none;
+            color: #007bff;
+            transition: color 0.3s ease;
+        }
+
+        .back-to-signup a:hover {
+            color: #2573c7;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        input[type="email"],
+        input[type="password"] {
+            width: 95%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #F9F5F6;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #2573c7;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>EventWave</h1>
+        <form>
+            <label for="email">Email:</label>
+            <input type="email" id="email" required>
+
+            <label for="password">Password:</label>
+            <input type="password" id="password" required>
+
+            <button type="button" onclick="signIn()">Sign In</button>
+        </form>
+        <div class="back-to-signup">
+            <a href="index.html">Back to Sign Up</a>
+        </div>
+    </div>
+
+    <script>
+        function signIn() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+           
+            fetch('http://localhost:9092/signIn', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    email: email,
+                    password: password
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data && data.id) {
+                    window.location.href = `details.html?userid=${data.id}`;
+                } else {
+                    alert('Invalid credentials. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Error occurred:', error);
+                alert('An error occurred while signing in. Please try again later.');
+            });
+        }
+    </script>
+</body>
+</html>

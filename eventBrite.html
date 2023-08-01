@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Event Viewer</title>
+  <style>
+    body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: rgb(74,85,162);
+            background: linear-gradient(339deg, rgba(74,85,162,1) 6%, rgba(120,149,203,1) 43%, rgba(160,191,224,1) 59%, rgba(185,213,241,1) 80%, rgba(197,223,248,1) 96%);
+        }
+
+     #searchForm {
+            display: flex;
+            margin-bottom: 1rem;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        #searchInput {
+            flex: 1;
+            padding: 0.5rem;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        #searchButton {
+            padding: 0.5rem 1rem;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #2573c7;
+        }
+
+       
+        .eventCard {
+            background-color: #fff;
+            border: 2px solid #4640bd;
+            border-radius: 10px;
+            width: calc(50% - 1rem);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .eventCard h3 {
+            margin: 0;
+            margin-bottom: 0.5rem;
+            color: #333;
+            font-size: 20px;
+        }
+
+        .eventCard p {
+            margin: 0;
+            color: #666;
+            font-size: 16px;
+        }
+        #searchButton:hover {
+            background-color: #2573c7;
+        }
+
+        #backButtonContainer {
+            margin-left: auto;
+        }
+
+        #backButton {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #backButton:hover {
+            background-color: #2573c7;
+        }
+  </style>
+</head>
+
+<body>
+  <div>
+    <h1>Event Brite</h1>
+  
+    <button id="backButton" onclick="goToDetailsPage()">Back to Homepage</button>
+    <form id="searchForm">
+      <input type="text" id="searchInput" placeholder="Enter Venue ID">
+      <button type="button" id="searchButton" onclick="filterEventsByVenue()">Search</button>
+    </form>
+  </div>
+  <div>
+    <h2>Events</h2>
+    <div id="eventsList">
+    </div>
+  </div>
+
+  <script>
+    
+    async function fetchAllEvents() {
+      const token = 'ZIJGTAF5X6YGKDB2FNQ2';
+      const url = `https://www.eventbriteapi.com/v3/organizations/1677640962763/events/?token=${token}`;
+
+      try {
+        const response = await fetch(url);
+        const data = await response.json();
+        const events = data.events;
+        displayEvents(events);
+      } catch (error) {
+        console.error('Error fetching events:', error);
+      }
+    }
+    function goToDetailsPage() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const userId = urlParams.get('userid');
+            window.location.href = `details.html?userid=${userId}`;
+        }
+
+  
+    async function filterEventsByVenue() {
+      const venue = document.getElementById('searchInput').value.trim();
+
+      if (!venue) {
+        alert('Please enter a Venue ID.');
+        return;
+      }
+
+      const token = 'H3SQRLA3CDVPPGTWFIH2'; 
+      const url = `https://www.eventbriteapi.com/v3/venues/${venue}/events/?token=${token}`;
+        //https://www.eventbriteapi.com/v3/venues/1/events/?token=ZIJGTAF5X6YGKDB2FNQ2
+      try {
+        const response = await fetch(url);
+        const data = await response.json();
+        const events = data.events;
+        displayEvents(events);
+      } catch (error) {
+        console.error('Error fetching events by city:', error);
+      }
+    }
+
+  
+    function displayEvents(events) {
+      const eventsList = document.getElementById('eventsList');
+      eventsList.innerHTML = '';
+
+      events.forEach((event) => {
+        const li = document.createElement('div');
+        li.classList.add('eventCard');
+
+        const eventName = event.name.text;
+        //const eventCity = event.venue && event.venue.address && event.venue.address.city;
+        const eventDate = event.start && event.start.local;
+        const organizationId = event.organization_id;
+        const venueId = event.venue_id;
+
+        const h3 = document.createElement('h3');
+        h3.textContent = eventName;
+        li.appendChild(h3);
+
+        // const pCity = document.createElement('p');
+        // pCity.textContent = `City: ${eventCity || 'N/A'}`;
+        // li.appendChild(pCity);
+        const pOrg = document.createElement('p');
+        pOrg.textContent = `Organization Id : ${organizationId || 'NA'}`;
+        li.appendChild(pOrg);
+
+        const pDate = document.createElement('p');
+        pDate.textContent = `Date: ${eventDate || 'N/A'}`;
+        li.appendChild(pDate);
+
+        const registerButton = document.createElement('button');
+        registerButton.textContent = 'Register';
+        registerButton.classList.add('registerButton');
+        registerButton.onclick = () => registerForEvent(eventName); 
+        li.appendChild(registerButton);
+
+        eventsList.appendChild(li);
+
+        eventsList.appendChild(li);
+      });
+    }
+
+    function registerForEvent(eventId) {
+        const urlParams = new URLSearchParams(window.location.search);
+            const userId = urlParams.get('userid');
+      fetch(`http://localhost:9092/register/event/${userId}/${eventId}`, {
+        method: 'PUT',
+      })
+      .then(response => {
+        if (response.ok) {
+          alert('Successfully registered for the event.');
+        } else {
+          alert('Failed to register for the event. Please try again.');
+        }
+      })
+      .catch(error => {
+        console.error('Error occurred:', error);
+        alert('An error occurred while registering for the event. Please try again later.');
+      });
+    }
+
+    fetchAllEvents();
+  </script>
+</body>
+
+</html>

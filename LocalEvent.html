@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Local Events</title>
+    <style>
+       
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: rgb(74,85,162);
+            background: linear-gradient(339deg, rgba(74,85,162,1) 6%, rgba(120,149,203,1) 43%, rgba(160,191,224,1) 59%, rgba(185,213,241,1) 80%, rgba(197,223,248,1) 96%);
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        .event-card {
+            border: 2px solid #4640bd;
+            border-radius: 10px;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+
+        .event-card h2 {
+            margin-top: 0;
+        }
+
+        .event-card p {
+            margin: 5px 0;
+        }
+
+        .search-form {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #2573c7;
+        }
+
+        #searchInput {
+            flex: 1;
+            padding: 5px;
+            width: 80%;
+            font-size: 20px;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(2px); 
+            background-color: rgba(255, 255, 255, 0.8);
+        }
+
+        #searchButton {
+            padding: 5px 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        #searchButton:hover {
+            background-color: #2573c7;
+        }
+
+        #backButtonContainer {
+            margin-left: auto;
+        }
+
+        #backButton {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #backButton:hover {
+            background-color: #2573c7;
+        }
+    </style>
+</head>
+<body>
+    <h1>Local Events</h1>
+    <button id="backButton" onclick="goToDetailsPage()">Back to Homepage</button>
+    <form id="searchForm">
+      <input type="text" id="searchInput" placeholder="Enter city name">
+      <button type="button" id="searchButton" onclick="filterEventsByCity()">Search</button>
+    </form>
+    <!-- <p><a href="details.html?userid=${data.id}">Back to Homepage</a></p> -->
+    
+    <div id="eventsContainer">
+    </div>
+
+    <script>
+        
+        function fetchEvents() {
+            fetch('http://localhost:9092/events')
+                .then(response => response.json())
+                .then(data => {
+                    displayEvents(data);
+                })
+                .catch(error => {
+                    console.error('Error occurred:', error);
+                    alert('An error occurred while fetching events. Please try again later.');
+                });
+        }
+
+        async function filterEventsByCity() {
+          const city = document.getElementById('searchInput').value.trim();
+
+if (!city) {
+  alert('Please enter a city name.');
+  return;
+}
+
+const url = `http://localhost:9092/event/${city}`;
+
+try {
+  const response = await fetch(url);
+  const events = await response.json();
+  displayEvents(events, 'localEvents');
+} catch (error) {
+  console.error('Error fetching events from the local server:', error);
+}
+    }
+
+        
+        function displayEvents(events) {
+            const eventsContainer = document.getElementById('eventsContainer');
+            eventsContainer.innerHTML = ''; 
+
+            events.forEach(event => {
+                const eventCard = document.createElement('div');
+                eventCard.classList.add('event-card');
+
+                const eventName = document.createElement('h2');
+                eventName.textContent = event.eventName || 'Event Name Not Provided';
+                eventCard.appendChild(eventName);
+
+                const city = document.createElement('p');
+                city.textContent = `City: ${event.city || 'City Not Provided'}`;
+                eventCard.appendChild(city);
+
+                const interests = document.createElement('p');
+                interests.textContent = event.interest ? `Interest: ${event.interest.join(', ')}` : 'Interest Not Provided';
+                eventCard.appendChild(interests);
+
+                const date = document.createElement('p');
+                date.textContent = `Date: ${event.date || 'Date Not Provided'}`;
+                eventCard.appendChild(date);
+
+                const registerButton = document.createElement('button');
+                registerButton.textContent = 'Register';
+                registerButton.classList.add('registerButton');
+                registerButton.onclick = () => registerForEvent(eventName.textContent);
+                eventCard.appendChild(registerButton);
+
+
+                eventsContainer.appendChild(eventCard);
+            });
+        }
+
+        function registerForEvent(eventId) {
+        const urlParams = new URLSearchParams(window.location.search);
+            const userId = urlParams.get('userid');
+      fetch(`http://localhost:9092/register/event/${userId}/${eventId}`, {
+        method: 'PUT',
+      })
+      .then(response => {
+        if (response.ok) {
+          alert('Successfully registered for the event.');
+        } else {
+          alert('Failed to register for the event. Please try again.');
+        }
+      })
+      .catch(error => {
+        console.error('Error occurred:', error);
+        alert('An error occurred while registering for the event. Please try again later.');
+      });
+    }
+
+        function goToDetailsPage() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const userId = urlParams.get('userid');
+            window.location.href = `details.html?userid=${userId}`;
+        }
+
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const userId = urlParams.get('userid');
+
+      
+        fetchEvents();
+    </script>
+</body>
+</html>
